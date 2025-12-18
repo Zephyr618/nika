@@ -15,8 +15,8 @@ from typing_extensions import TypedDict
 from agent.domain_agents.diagnosis_agent import DiagnosisAgent
 from agent.domain_agents.submission_agent import SubmissionAgent
 from agent.utils.loggers import FileLoggerHandler
-from llm4netlab.utils.logger import system_logger
-from llm4netlab.utils.session import Session
+from nika.utils.logger import system_logger
+from nika.utils.session import Session
 
 load_dotenv()
 

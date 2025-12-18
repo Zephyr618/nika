@@ -1,11 +1,11 @@
+import argparse
 import json
-import logging
 import random
 
-from llm4netlab.orchestrator.problems.prob_pool import get_problem_instance, list_avail_problem_names
-from llm4netlab.orchestrator.problems.problem_base import TaskLevel
-from llm4netlab.utils.logger import system_logger
-from llm4netlab.utils.session import Session
+from nika.orchestrator.problems.prob_pool import get_problem_instance, list_avail_problem_names
+from nika.orchestrator.problems.problem_base import TaskLevel
+from nika.utils.logger import system_logger
+from nika.utils.session import Session
 
 
 def inject_failure(problem_names: list[str], re_inject: bool = True):
@@ -53,6 +53,14 @@ def inject_failure(problem_names: list[str], re_inject: bool = True):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    parser = argparse.ArgumentParser(description="Inject failure into the network environment.")
 
-    inject_failure(["frr_service_down"], True)
+    parser.add_argument(
+        "--problem",
+        type=str,
+        default="frr_service_down",
+        help="The issue to inject, e.g. frr_service_down, bmv2_service_down, etc.",
+    )
+    args = parser.parse_args()
+
+    inject_failure(problem_names=[args.problem])

@@ -9,7 +9,7 @@ from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.messages import BaseMessage, ToolMessage
 from langchain_core.outputs.generation import Generation
 
-from llm4netlab.config import BASE_DIR
+from nika.config import BASE_DIR
 
 
 class FileLoggerHandler(BaseCallbackHandler):

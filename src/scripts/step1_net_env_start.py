@@ -1,9 +1,9 @@
 import argparse
 from typing import Literal
 
-from llm4netlab.net_env.net_env_pool import get_net_env_instance
-from llm4netlab.utils.logger import refresh_logger, system_logger
-from llm4netlab.utils.session import Session
+from nika.net_env.net_env_pool import get_net_env_instance
+from nika.utils.logger import refresh_logger, system_logger
+from nika.utils.session import Session
 
 
 def parse_kv(s):

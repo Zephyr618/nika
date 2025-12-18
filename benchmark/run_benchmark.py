@@ -2,7 +2,7 @@ import os
 
 import polars as pl
 
-from llm4netlab.net_env.net_env_pool import get_net_env_instance
+from nika.net_env.net_env_pool import get_net_env_instance
 from scripts.step1_net_env_start import start_net_env
 from scripts.step2_failure_inject import inject_failure
 from scripts.step3_agent_run import start_agent

@@ -3,8 +3,8 @@ import asyncio
 import logging
 
 from agent.react_agent import BasicReActAgent
-from llm4netlab.utils.logger import system_logger
-from llm4netlab.utils.session import Session
+from nika.utils.logger import system_logger
+from nika.utils.session import Session
 
 
 def _agent_selector(agent_type: str, backend_model: str, max_steps: int = 20):

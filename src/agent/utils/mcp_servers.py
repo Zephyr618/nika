@@ -1,13 +1,13 @@
 import os
 
-from llm4netlab.utils.session import Session
+from nika.utils.session import Session
 
 
 class MCPServerConfig:
     def __init__(self):
         # load paths
         base_dir = os.getenv("BASE_DIR")
-        self.mcp_server_dir = os.path.join(base_dir, "src/llm4netlab/service/mcp_server")
+        self.mcp_server_dir = os.path.join(base_dir, "src/nika/service/mcp_server")
         self.session = Session()
         self.session.load_running_session()
 

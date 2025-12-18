@@ -3,17 +3,17 @@ import json
 import os
 import textwrap
 
-from llm4netlab.config import BASE_DIR
-from llm4netlab.evaluator.llm_judge import JudgeResponse, LLMJudge
-from llm4netlab.evaluator.result_log import EvalResult, record_eval_result
-from llm4netlab.evaluator.trace_parser import AgentTraceParser
-from llm4netlab.net_env.net_env_pool import get_net_env_instance
-from llm4netlab.orchestrator.problems.prob_pool import get_problem_instance
-from llm4netlab.orchestrator.tasks.detection import DetectionSubmission
-from llm4netlab.orchestrator.tasks.localization import LocalizationTask
-from llm4netlab.orchestrator.tasks.rca import RCATask
-from llm4netlab.utils.logger import system_logger
-from llm4netlab.utils.session import Session
+from nika.config import BASE_DIR
+from nika.evaluator.llm_judge import JudgeResponse, LLMJudge
+from nika.evaluator.result_log import EvalResult, record_eval_result
+from nika.evaluator.trace_parser import AgentTraceParser
+from nika.net_env.net_env_pool import get_net_env_instance
+from nika.orchestrator.problems.prob_pool import get_problem_instance
+from nika.orchestrator.tasks.detection import DetectionSubmission
+from nika.orchestrator.tasks.localization import LocalizationTask
+from nika.orchestrator.tasks.rca import RCATask
+from nika.utils.logger import system_logger
+from nika.utils.session import Session
 
 logger = system_logger
 

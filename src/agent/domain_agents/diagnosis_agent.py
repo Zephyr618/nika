@@ -9,7 +9,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from agent.llm.model_factory import load_model
 from agent.utils.loggers import FileLoggerHandler
 from agent.utils.mcp_servers import MCPServerConfig
-from llm4netlab.orchestrator.orchestrator import Orchestrator
+from nika.orchestrator.orchestrator import Orchestrator
 
 load_dotenv()
 
