@@ -1,13 +1,10 @@
 <div align="center">
-<h1>Network Incidents Benchmarking Framework for AI Agents (NIKA)</h1>
+<h1>A Network Arena for Benchmarking AI Agents on Network Troubleshooting</h1>
 
 [🤖Overview](#🤖overview) | 
 [📦Installation](#📦installation) | 
 [🚀Quick Start](#🚀quick-start) | 
-[🛠️Usage](#🛠️usage) | 
-[📚Cite](#📚cite)
-
-[![ArXiv Link](https://img.shields.io/badge/arXiv-2507.01997-red?logo=arxiv)](https://arxiv.org/abs/2507.01997v1) [![NGNO'25 Proceedings](https://img.shields.io/badge/NGNO'25%20Proceedings-blue)](https://dl.acm.org/doi/10.1145/3748496.3748990)
+[🛠️Usage](#🛠️usage)
 
 </div>
 
@@ -15,16 +12,17 @@
 
 ![alt text](./assets/images/NIKA_architecture.png)
 
-NIKA (Network Incidents Benchmark for AI Agents) is a standardized, reproducible, and open benchmarking platform to build and evaluate AI agents on network troubleshooting with low operational effort. This platform primarily aims to *standardize* and *democratize* the experimentation with AI agents, by enabling researchers and practitioners -- including non domain-experts such as ML engineers and data scientists -- to focus on the evaluation of AI agents on curated problem sets, without concern for underlying operational complexities. Custom AI agents can be easily plugged through a single API and rapidly evaluated.
+This repository is a unified platform that can offer: 
+1. A benchmark suite of curated network incidents that covers 54 realistic network issues, ranging from link and host failures to resource contention, and includes five network scenarios, four of which can be instantiated at different topology sizes, spanning campus and data center networks. By combining these dimensions, the benchmark yields 640 distinct troubleshooting incidents for evaluating AI agents. The benchmark can be further extended by randomizing failure locations and composing multiple issues within a single incident. 
+2. A modular plug-and-play orchestration platform that connects AI agents with the network environment, enabling real-time troubleshooting in realistic conditions, and providing a human-facing interface to monitor agent performance.
 
-This is the code repository for the paper [Towards a Playground to Democratize Experimentation and Benchmarking of AI Agents for Network Troubleshooting](https://arxiv.org/abs/2507.01997), which was accepted at the [ACM SIGCOMM 2025 1st Workshop on Next-Generation Network Observability (NGNO)](https://conferences.sigcomm.org/sigcomm/2025/workshop/ngno/).
 
-💡 **Note:** We are actively developing NIKA. If you have any suggestions or are interested in contributing, feel free to reach out to us!
+💡 **Note:** We are actively developing this framework. If you have any suggestions or are interested in contributing, feel free to reach out to us!
 
 ## Features
 
 - Standardized network troubleshooting environment based on Kathará
-- [<img src="https://mintcdn.com/mcp/4ZXF1PrDkEaJvXpn/logo/light.svg?maxW=1338&auto=format&n=4ZXF1PrDkEaJvXpn&q=85&s=f9f25f0b2f8cbf9e7f1f6ac1fc4f1745" alt="MCP" height="16" style="vertical-align:middle;background:white;"> MCP](https://modelcontextprotocol.io/docs/getting-started/intro)-based tool support
+- MCP-based tool support
 - Pre-built network scenarios and fault injection mechanisms
 - Reproducible evaluation framework
 - Support for various network topologies and configurations
@@ -47,17 +45,14 @@ NIKA uses [uv](https://docs.astral.sh/uv) to manage the dependencies. Follow [uv
 
 ```shell
 # Clone the repository
-git clone https://github.com/zhihao1998/NIKA.git
-cd NIKA
+git clone https://github.com/sands-lab/nika
+cd nika
 
 # Install dependencies
 uv sync
 
 # Activate the environment
 uv venv activate
-
-# (Optional) Run an interactive shell in the environment
-uv run bash
 ```
 
 The Kathará API relies on Docker to function properly. We recommend to add current user to docker group to avoid calling with `sudo`. **However, please be aware of the security implications of this action.**
@@ -88,13 +83,18 @@ LANGSMITH_ENDPOINT=<>
 LANGSMITH_API_KEY=<>
 LANGSMITH_PROJECT=<>
 
-# if use google search MCP server
-# check google Programmable Search Engine guides for more details
-GOOGLE_SEARCH_API_KEY=<>
-GOOGLE_SEARCH_CSE_ID=<>
+# if use langfuse for observability
+# check langfuse documentation for more details
+LANGFUSE_SECRET_KEY = <>
+LANGFUSE_PUBLIC_KEY = <>
+LANGFUSE_BASE_URL = "https://cloud.langfuse.com"
 
-# api key for you LLM, e.g. DeepSeek-R1 here
+# api key for you LLM, e.g. DeepSeek here
 DEEPSEEK_API_KEY=<>
+OPENAI_API_KEY=<>
+
+# if use ollama for llm 
+OLLAMA_API_URL=<>
 ```
 
 ## Step by step guide
@@ -109,7 +109,7 @@ You can follow the steps below to run a complete troubleshooting task with NIKA.
 2. **Inject faults into the network environment**
 
    ```shell
-   python3 scripts/step2_failure_inject.py --problems <problem_id_1> <problem_id_2> --task_level <detection|localization|rca>
+   python3 scripts/step2_failure_inject.py --problem <problem_id>
    ```
 
 3. **Run the AI agent to troubleshoot the network**
@@ -123,42 +123,83 @@ You can follow the steps below to run a complete troubleshooting task with NIKA.
     python3 scripts/step4_result_eval.py --judge_model <judge_model>
     ```
 
+Alternatively, you can run the `benchmark/run_benchmark.py` script to execute all steps for all predefined incidents in the benchmark suite. This script will automatically start the network environment, inject faults, run the AI agent, and evaluate the results.
+
 
 <h1 id="🛠️usage">🛠️ Usage</h1>
 
 ## Network Scenarios
 
-NIKA supports multiple network scenarios under the `NIKA/net_env` directory, including data center networks, interdomain routing, intradomain routing, etc. Several supported scenarios based on Kathará include:
+This framework supports multiple network scenarios under the `nika/net_env` directory, including:
 
-- **Interdomain routing** with BGP
-- **Intradomain routing** with OSPF
-- **Basic P4 L2 forwarding** with BMv2 switches
-- **In-band network telemetry (INT) in P4** with BMv2 switches
+| Scenario                                 | Scalable | Description                                                        |
+| ---------------------------------------- | -------- | ------------------------------------------------------------------ |
+| Data center network (CLOS)               | ✓        | Multi-tier leaf–spine fabric with edge servers.                    |
+| Campus network (3-tier)                  | ✓        | Enterprise core–distribution–access topology.                      |
+| ISP backbone network (meshed)            | ✓        | Provider-style backbone with core and access nodes.                |
+| SDN-enabled cloud POP fabric (CLOS/star) | ✓        | SDN fabric with centralized controller and edge switches.          |
+| P4 programmable testbed                  | --       | Compact testbed for data-plane algorithms and pipeline validation. |
 
-💡 More scenarios are coming soon!
+
+💡 More scenarios are WIP!
 
 Each scenario is defined in a Kathará `lab.py` file, which specifies the network topology, devices, and initial configurations. Check [Kathará API Docs](https://github.com/KatharaFramework/Kathara/wiki/Kathara-API-Docs) for more details if you want to create your scenarios.
 
-## Tasks and Problems
+## Network issues
 
-Check all available problems at `LLM4NetLab/orchestrator/problems`. Some of them are listed below.
+This framework provides a set of predefined issues that can be injected into the network environment. These issues are categorized into different types, each with specific root causes and key signals. By combining the issues with the network scenarios, randomlizing the failure locations, and composing multiple issues, this framework can generate multiple incidents based on a network issue (see # Incident column).
+The following table summarizes the issues available in this framework:
 
-| Task level   | Issue type                  | Problem ID                       | Description                                           |
-| ------------ | --------------------------- | -------------------------------- | ----------------------------------------------------- |
-| detection    | device_failure              | frr_down_detection               | Detect if there is a down FRR service.                |
-| localization | device_failure              | frr_down_localization            | Localize the failure of FRR service.                  |
-| detection    | device_failure              | bmv2_down_detection              | Detect if there is a down BMv2 device.                |
-| detection    | config_access_policy_error  | bgp_acl_block_detection          | Detect if ACL blocks BGP traffic.                     |
-| detection    | config_routing_policy_error | bgp_asn_misconfig_detection      | Detect ASN misconfiguration causing BGP peer failure. |
-| detection    | config_access_policy_error  | ospf_acl_block_detection         | Detect if ACL blocks OSPF traffic.                    |
-| detection    | config_routing_policy_error | ospf_misconfig_detection         | Detect OSPF area misconfiguration.                    |
-| detection    | p4_runtime_error            | p4_table_entry_missing_detection | Detect missing P4 table entry.                        |
-| detection    | performance_degradation     | p4_int_hop_delay_high_detection  | Detect high hop delay in P4 via INT signals.          |
-| detection    | performance_degradation     | p4_packet_loss_detection         | Detect packet loss in P4 via port counters .          |
+| Category                               | Root Cause                              | Key Signals                                                     | # Incident |
+| -------------------------------------- | --------------------------------------- | --------------------------------------------------------------- | ---------- |
+| Link failures                          | Link flap                               | Flap event logs; packet drops                                   | 26         |
+| Link failures                          | Link detached                           | Physical link not detected; PHY down                            | 26         |
+| Link failures                          | Link down                               | Interface state down                                            | 26         |
+| Link failures                          | Faulty cable                            | CRC errors; corrupted frames                                    | 26         |
+| Link failures                          | MAC address conflict                    | Same MAC seen on multiple ports; MAC flapping logs              | 26         |
+| Link failures                          | Link fragmentation disabled             | Large packets dropped; MTU mismatch                             | 26         |
+| End-host failures                      | Conflicting VPN memberships             | Overlapping subnets; VPN servers unreachable                    | 3          |
+| End-host failures                      | Host crash                              | Host unresponsive; no heartbeat; ping fails                     | 35         |
+| End-host failures                      | Host IP conflict                        | Duplicate IP alerts; ARP conflict detected                      | 26         |
+| End-host failures                      | Host IP misconfig                       | Incorrect or missing IP address; host unresponsive              | 68         |
+| End-host failures                      | Incorrect netmask                       | Partial reachability; inconsistent routing behavior             | 16         |
+| End-host failures                      | DNS empty answer                        | Incorrect or missing DNS records; NXDOMAIN                      | 6          |
+| Network node errors                    | Number of MPLS labels hit limit         | Error logs; packet drops                                        | 1          |
+| Network node errors                    | Switch/router crash (e.g., overheating) | Switch down and unreachable from MGMT                           | 20         |
+| Network node errors                    | P4 program reads `invalid` header field | Packet drops; error logs (platform-dependent)                   | 8          |
+| Network node errors                    | SDN controller crash                    | Switches isolated; new flows dropped                            | 6          |
+| Network node errors                    | Southbound port unreachable             | OpenFlow/TCP 6633/6653 unreachable                              | 12         |
+| Misconfigurations (routing, ACL, etc.) | BGP ASN mismatch                        | BGP session fails; ASN mismatch detected                        | 7          |
+| Misconfigurations (routing, ACL, etc.) | BGP blackhole route leak                | Traffic to specific prefixes blackholed; unexpected AS path     | 7          |
+| Misconfigurations (routing, ACL, etc.) | Missing BGP advertisement               | Prefix not propagated; missing announcements                    | 7          |
+| Misconfigurations (routing, ACL, etc.) | Host static blackhole                   | Static blackhole route active; traffic dropped                  | 7          |
+| Misconfigurations (routing, ACL, etc.) | OSPF area misconfiguration              | OSPF adjacency failure; area mismatch                           | 6          |
+| Misconfigurations (routing, ACL, etc.) | OSPF neighbor missing                   | Missing neighbor; no Hello packets exchanged                    | 6          |
+| Misconfigurations (routing, ACL, etc.) | Forwarding table entry misconfig        | No matching entry; default drop                                 | 8          |
+| Misconfigurations (routing, ACL, etc.) | Flow rule loop                          | Traffic loop observed; CPU spike; port flooding                 | 6          |
+| Misconfigurations (routing, ACL, etc.) | Flow rule shadowing                     | Lower-priority rule overridden by higher-priority rule          | 6          |
+| Misconfigurations (routing, ACL, etc.) | ARP ACL block                           | ARP requests or replies dropped; ACL deny counters increase     | 26         |
+| Misconfigurations (routing, ACL, etc.) | ICMP ACL block                          | ICMP traffic blocked; ping fails                                | 26         |
+| Misconfigurations (routing, ACL, etc.) | Routing control-plane ACL block         | BGP (TCP/179) or OSPF (IP proto 89) blocked; neighborship fails | 13         |
+| Misconfigurations (routing, ACL, etc.) | HTTP ACL block                          | HTTP 80/443 traffic blocked; client connection timeout          | 12         |
+| Resource contention                    | Microbursts on interface                | Reduced throughput; queue buildup                               | 26         |
+| Resource contention                    | Receiver saturated & slow               | Multiple segments ACKed per ACK; RWND < CWND                    | 12         |
+| Resource contention                    | Incast traffic                          | Queue buildup; packet drops; retransmissions                    | 12         |
+| Resource contention                    | Sender saturated & slow                 | Segments smaller than MSS; Flight size < min(CWND,RWND)         | 24         |
+| Resource contention                    | Software middle-box overloads           | CPU usage saturates; queue buildup; RTT increases               | 3          |
+| Network under attack                   | Service DoS                             | Surge in HTTP connections; CPU/RAM usage spikes                 | 18         |
+| Network under attack                   | BGP hijacking                           | More specific or illegitimate prefixes appear; path anomaly     | 3          |
+| Network under attack                   | DHCP spoofing                           | DHCP clients received spoofed configurations (IP, DNS, etc.)    | 9          |
+| Network under attack                   | DNS spoofing                            | DNS points to wrong addresses                                   | 12         |
+| Network under attack                   | ARP cache poisoning                     | Abnormal traffic redirection                                    | 26         |
+| Network under attack                   | Misaligned sketch thresholds            | False-positive cardinality alerts (e.g., DoS); packet drops     | 1          |
+| **Total**                              | -                                       | -                                                               | **640**    |
+
+Based on the above issues, we disclose a large public dataset of AI agents’ behavior for network troubleshooting, with more than 900 reasoning traces. See the [dataset page](https://zenodo.org/records/17971675).
 
 ## MCP Servers and Tools
 
-NIKA provides a set of MCP servers and tools to facilitate network troubleshooting tasks. All servers are available under `src/llm4netlab/service/mcp_server`. These include:
+This framework provides a set of MCP servers and tools to facilitate network troubleshooting tasks. All servers are available under `src/nika/service/mcp_server`. These include:
 
 - **base mcp server for Kathará**: This server provides the basic functionality for interacting with Kathará network scenarios, including
   - `get_reachability` to check the reachability by pinging all pairs of hosts.
@@ -193,7 +234,7 @@ You can also plug in your own MCP servers following the configuration instructio
 
 Since the network environment and kathará run on Linux, and Claude desktop runs on Windows, we need some tricks here.
 
-1. Modify the `xxx_mcp_server.py` files under `src/llm4netlab/service/mcp_server` as follows:
+1. Modify the `xxx_mcp_server.py` files under `src/nika/service/mcp_server` as follows:
    
 ```python
 mcp = FastMCP(name="kathara_base_mcp_server", host="127.0.0.1", port=8000)
@@ -224,11 +265,11 @@ mcp.run(transport="sse")
 
 ## Logging and Observability
 
-With mcp-use, NIKA supports to log and monitor agents with Langfuse, Laminar, and LangSmith, check [mcp-use Observability](https://docs.mcp-use.com/development/observability) and [Langchain Callbacks](https://python.langchain.com/docs/concepts/callbacks/) for details.
+This framework supports to log and monitor agents with Langfuse, Laminar, and LangSmith, check [Langchain Callbacks](https://python.langchain.com/docs/concepts/callbacks/) for details.
 
 ### Customized Logger
 
-NIKA allows users to implement customized logging solutions tailored to their specific needs. This can be achieved by plugging the callback function to `mcp_use.MCPAgent`. For example, 
+This framework allows users to implement customized logging solutions tailored to their specific needs. This can be achieved by plugging the callback function to `mcp_use.MCPAgent`. For example, 
 
 ```python
 from langchain.callbacks.base import BaseCallbackHandler
@@ -265,25 +306,6 @@ agent = MCPAgent(
 )
 ```
 
-<h1 id="📚cite">📚 Cite</h1>
-
-```bibtex
-@inproceedings{wangtowards2025,
-author = {Wang, Zhihao and Cornacchia, Alessandro and Galante, Franco and Centofanti, Carlo and Sacco, Alessio and Jiang, Dingde},
-title = {Towards a Playground to Democratize Experimentation and Benchmarking of AI Agents for Network Troubleshooting},
-year = {2025},
-isbn = {9798400720871},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-url = {https://doi.org/10.1145/3748496.3748990},
-doi = {10.1145/3748496.3748990},
-booktitle = {Proceedings of the 1st Workshop on Next-Generation Network Observability},
-pages = {1–3},
-numpages = {3},
-location = {Coimbra, Portugal},
-series = {NGNO '25}
-}
-```
 
 # Acknowledgement
 

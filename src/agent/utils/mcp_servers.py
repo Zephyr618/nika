@@ -1,13 +1,13 @@
 import os
 
-from llm4netlab.utils.session import Session
+from nika.utils.session import Session
 
 
 class MCPServerConfig:
     def __init__(self):
         # load paths
         base_dir = os.getenv("BASE_DIR")
-        self.mcp_server_dir = os.path.join(base_dir, "src/llm4netlab/service/mcp_server")
+        self.mcp_server_dir = os.path.join(base_dir, "src/nika/service/mcp_server")
         self.session = Session()
         self.session.load_running_session()
 
@@ -16,7 +16,7 @@ class MCPServerConfig:
             config = {
                 "task_mcp_server": {
                     "command": "python3",
-                    "args": [f"{self.mcp_server_dir}/task_mcp_server_{self.session.task_level}.py"],
+                    "args": [f"{self.mcp_server_dir}/task_mcp_server.py"],
                     "transport": "stdio",
                 },
             }
@@ -48,8 +48,7 @@ class MCPServerConfig:
         for server in config.values():
             server["env"] = {
                 "LAB_SESSION_ID": self.session.session_id,
-                "ROOT_CAUSE_NAME": self.session.root_cause_name,
-                "TASK_LEVEL": self.session.task_level,
+                "root_cause_name": self.session.root_cause_name,
                 "LAB_NAME": self.session.scenario_name,
                 "backend_model": self.session.backend_model,
                 "agent_type": self.session.agent_type,

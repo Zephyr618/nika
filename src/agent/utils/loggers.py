@@ -3,18 +3,21 @@ import logging
 import os
 import traceback
 from datetime import datetime
+from typing import Any
 
 from langchain_core.callbacks.base import BaseCallbackHandler
+from langchain_core.messages import BaseMessage, ToolMessage
 from langchain_core.outputs.generation import Generation
 
-from llm4netlab.config import BASE_DIR
+from nika.config import BASE_DIR
 
 
 class FileLoggerHandler(BaseCallbackHandler):
-    def __init__(self, log_path: str = None):
+    def __init__(self, name=None):
         super().__init__()
-        self.logger = logging.getLogger(__name__)
+        self.logger = logging.getLogger("LLMAgentLogger")
         self.logger.setLevel(logging.INFO)
+        self.logger.propagate = False
 
         for h in list(self.logger.handlers):
             self.logger.removeHandler(h)
@@ -27,9 +30,8 @@ class FileLoggerHandler(BaseCallbackHandler):
             BASE_DIR,
             "results",
             session_info["root_cause_name"],
-            session_info["task_level"],
             session_info["session_id"],
-            "conversation.log",
+            f"conversation_{name}.log",
         )
         os.makedirs(os.path.dirname(log_path), exist_ok=True)
 
@@ -43,12 +45,17 @@ class FileLoggerHandler(BaseCallbackHandler):
         log_entry = {"timestamp": datetime.now(), "event": event_type, **payload}
         self.logger.info(json.dumps(log_entry, ensure_ascii=False, default=str))
 
-    def on_llm_start(self, serialized, prompts, **kwargs):
+    def on_chat_model_start(
+        self,
+        serialized: dict[str, Any],
+        messages: list[list[BaseMessage]],
+        **kwargs,
+    ) -> None:
         self._log(
             "llm_start",
             {
-                "prompts": prompts,
-                "metadata": serialized,
+                "messages": messages[0][-1],
+                "model": serialized,
             },
         )
 
@@ -57,7 +64,6 @@ class FileLoggerHandler(BaseCallbackHandler):
         try:
             res: Generation = response.generations[0][0]
             if res:
-                # TODO: Now only works for ollama_langchain, to adapt to other LLMs
                 text = getattr(res, "text", None)
                 if text:
                     payload["text"] = res.text
@@ -66,15 +72,6 @@ class FileLoggerHandler(BaseCallbackHandler):
                     payload["generation_info"] = res.generation_info
                 message = getattr(res, "message", None)
                 if message:
-                    # TODO: Check the tool call formats
-                    # tool_calls = getattr(message, "tool_call_chunks", []) or []
-                    # if tool_calls:
-                    #     for tool_call in tool_calls:
-                    #         payload["tool_calls"] = {
-                    #             "tool_name": getattr(tool_call, "tool_name", None),
-                    #             "tool_input": getattr(tool_call, "tool_input", None),
-                    #         }
-
                     payload["invalid_tool_calls"] = getattr(message, "invalid_tool_calls", None)
                     payload["usage_metadata"] = getattr(message, "usage_metadata", None)
                 self._log("llm_end", payload)
@@ -93,11 +90,21 @@ class FileLoggerHandler(BaseCallbackHandler):
             },
         )
 
-    def on_tool_end(self, output, **kwargs):
+    def on_tool_end(self, output: ToolMessage, **kwargs):
+        if output.status == "error":
+            self._log(
+                "tool_error",
+                {
+                    "output": output,
+                },
+            )
+            return
+
         self._log(
             "tool_end",
             {
                 "output": output,
+                "output_type": type(output).__name__,
             },
         )
 
