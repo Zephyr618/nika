@@ -4,7 +4,10 @@
 [🤖Overview](#🤖overview) | 
 [📦Installation](#📦installation) | 
 [🚀Quick Start](#🚀quick-start) | 
-[🛠️Usage](#🛠️usage)
+[🛠️Usage](#🛠️usage) | 
+[📚Cite](#📚cite)
+
+[![ArXiv Link](https://img.shields.io/badge/arXiv-2512.16381-red?logo=arxiv)](https://arxiv.org/abs/2512.16381)
 
 </div>
 
@@ -195,7 +198,7 @@ The following table summarizes the issues available in this framework:
 | Network under attack                   | Misaligned sketch thresholds            | False-positive cardinality alerts (e.g., DoS); packet drops     | 1          |
 | **Total**                              | -                                       | -                                                               | **640**    |
 
-Based on the above issues, we disclose a large public dataset of AI agents’ behavior for network troubleshooting, with more than 900 reasoning traces. See the [dataset page](https://zenodo.org/records/17971675).
+Based on the above issues, we disclose a large public dataset of AI agents’ behavior for network troubleshooting, with more than 900 reasoning traces. See the [![Zenodo Dataset](https://img.shields.io/badge/Zenodo-17971675-blue?logo=zenodo)](https://zenodo.org/records/17971675).
 
 ## MCP Servers and Tools
 
@@ -306,6 +309,19 @@ agent = MCPAgent(
 )
 ```
 
+<h1 id="📚cite">📚 Cite</h1>
+
+```bibtex
+@misc{wang2025networkarenabenchmarkingai,
+      title={A Network Arena for Benchmarking AI Agents on Network Troubleshooting}, 
+      author={Zhihao Wang and Alessandro Cornacchia and Alessio Sacco and Franco Galante and Marco Canini and Dingde Jiang},
+      year={2025},
+      eprint={2512.16381},
+      archivePrefix={arXiv},
+      primaryClass={cs.NI},
+      url={https://arxiv.org/abs/2512.16381}, 
+}
+```
 
 # Acknowledgement
 

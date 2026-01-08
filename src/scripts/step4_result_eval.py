@@ -182,7 +182,7 @@ def eval_results(judge_model, destroy_env=True):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="End Network Environment")
+    parser = argparse.ArgumentParser(description="Evaluate agent results.")
     parser.add_argument(
         "--judge_model",
         type=str,

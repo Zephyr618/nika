@@ -6,17 +6,6 @@ from nika.utils.logger import refresh_logger, system_logger
 from nika.utils.session import Session
 
 
-def parse_kv(s):
-    if "=" not in s:
-        raise argparse.ArgumentTypeError("Parameters must be in key=value format")
-    key, value = s.split("=", 1)
-    try:
-        value = int(value)
-    except ValueError:
-        pass
-    return key, value
-
-
 def start_net_env(scenario_name: str, topo_size: Literal["s", "m", "l"] | None = None, redeploy: bool = True):
     """
     Every run starts a new session.
@@ -34,29 +23,31 @@ def start_net_env(scenario_name: str, topo_size: Literal["s", "m", "l"] | None =
     session.init_session()
     session.update_session("scenario_name", scenario_name)
     session.update_session("scenario_topo_size", topo_size)
-    system_logger.info(f"Started network environment: {scenario_name} with session ID: {session.session_id}")
+    system_logger.info(
+        f"Started network environment: {scenario_name} with size {topo_size} in session {session.session_id}"
+    )
     return net_env
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Start Network Environment")
+    parser = argparse.ArgumentParser(
+        description="Start network environment with specified parameters (i.e., topology size)."
+    )
 
     parser.add_argument(
         "--scenario",
         type=str,
-        default="dc_clos_service",
+        default="simple_bgp",
         help="Name of the network environment to start (default: simple_bgp)",
     )
 
     parser.add_argument(
-        "--scenario_params",
-        nargs="*",
-        type=parse_kv,
-        default=[("topo_size", "m")],
-        help="Dynamic key=value pairs (e.g. --scenario_params topo_size=m )",
+        "--topo_size",
+        type=str,
+        choices=["s", "m", "l"],
+        default=None,
+        help="Topology size (s/m/l). Only required for certain scenarios.",
     )
 
     args = parser.parse_args()
-
-    params = dict(args.scenario_params)
-    start_net_env(args.scenario, **params)
+    start_net_env(args.scenario, args.topo_size)

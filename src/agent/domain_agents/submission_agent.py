@@ -1,5 +1,3 @@
-import asyncio
-import logging
 from textwrap import dedent
 
 from dotenv import load_dotenv
@@ -8,7 +6,6 @@ from langchain_core.tools.structured import StructuredTool
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from agent.llm.model_factory import load_model
-from agent.utils.loggers import FileLoggerHandler
 from agent.utils.mcp_servers import MCPServerConfig
 
 load_dotenv()
@@ -41,24 +38,3 @@ class SubmissionAgent:
             model=self.llm, system_prompt=SUBMIT_PROMPT_TEMPLATE, tools=self.tools, name="SubmissionAgent"
         )
         return agent
-
-
-async def run_submission_agent():
-    logging.basicConfig(level=logging.INFO)
-
-    submission_agent = SubmissionAgent()
-    await submission_agent.load_tools()
-
-    graph = submission_agent.get_agent()
-    inputs = {
-        "messages": ["There is a failed FRR service on router1. Please submit the root cause."],
-    }
-    result = await graph.ainvoke(
-        inputs,
-        config={"callbacks": [FileLoggerHandler()]},
-    )
-    print("Final submission result:", result)
-
-
-if __name__ == "__main__":
-    asyncio.run(run_submission_agent())

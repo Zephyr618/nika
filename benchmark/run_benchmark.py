@@ -21,10 +21,10 @@ def run_benchmark():
         scenario = row["scenario"]
         topo_size = row["topo_size"]
         # increase topo_size
-        if topo_size == "s":
-            topo_size = "m"
-        elif topo_size == "-":
-            continue
+        # if topo_size == "s":
+        #     topo_size = "m"
+        # elif topo_size == "-":
+        #     continue
 
         # Start the scenario and inject failure only once per (problem and scenario)
         is_scenario_started = False

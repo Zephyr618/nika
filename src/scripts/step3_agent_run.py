@@ -35,19 +35,33 @@ def start_agent(agent_type: str, backend_model: str, max_steps: int):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    parser = argparse.ArgumentParser(description="Inject Failure into Network Environment")
-    parser.add_argument(
-        "--agent_type", type=str, nargs="?", default="ReAct", help="Type of agent to run (default: ReAct)"
+    parser = argparse.ArgumentParser(
+        description=(
+            "Run the specified agent to start troubleshooting. \n"
+            "Note: the backend LLM must be configured before running this command."
+        )
     )
+
+    parser.add_argument(
+        "--agent_type",
+        type=str,
+        default="ReAct",
+        help="Type of agent to run (default: ReAct)",
+    )
+
     parser.add_argument(
         "--backend_model",
         type=str,
-        nargs="?",
         default="gpt-oss:20b",
         help="Backend model for the agent (default: gpt-oss:20b)",
     )
+
     parser.add_argument(
-        "--max_steps", type=int, nargs="?", default=20, help="Maximum steps for the agent to take (default: 20)"
+        "--max_steps",
+        type=int,
+        default=20,
+        help="Maximum steps for the agent to take (default: 20)",
     )
+
     args = parser.parse_args()
     start_agent(args.agent_type, args.backend_model, args.max_steps)
