@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
+from nika.config import BASE_DIR, RESULTS_DIR
 from nika.orchestrator.problems.prob_pool import list_avail_problem_names as _list_avail_problems
 from nika.utils.errors import safe_tool
 
@@ -21,8 +22,8 @@ load_dotenv(verbose=True)
 LAB_SESSION_ID = os.getenv("LAB_SESSION_ID")
 gt_root_cause_name = os.getenv("root_cause_name")
 
-base_dir = os.getenv("BASE_DIR")
-results_dir = os.getenv("RESULTS_DIR")
+base_dir = BASE_DIR
+results_dir = RESULTS_DIR
 
 
 class SubmissionFormat(BaseModel):

@@ -100,6 +100,14 @@ OPENAI_API_KEY=<>
 OLLAMA_API_URL=<>
 ```
 
+## Build the required Docker images
+
+NIKA uses several customized images to support fault injection. Run 
+
+```shell
+bash src/nika/net_env/utils/DockerFiles/build_dockers.sh
+```
+
 ## Step by step guide
 You can follow the steps below to run a complete troubleshooting task with NIKA.
 
@@ -126,8 +134,44 @@ You can follow the steps below to run a complete troubleshooting task with NIKA.
     python3 scripts/step4_result_eval.py --judge_model <judge_model>
     ```
 
+### Benchmark Runner
+
 Alternatively, you can run the `benchmark/run_benchmark.py` script to execute all steps for all predefined incidents in the benchmark suite. This script will automatically start the network environment, inject faults, run the AI agent, and evaluate the results.
 
+1. Run benchmarks from CSV (default)
+
+```shell
+python run_benchmark.py
+```
+
+or specify a CSV file:
+
+```shell
+python run_benchmark.py --benchmark-csv ./benchmark.csv
+```
+
+Run a single benchmark
+
+```shell
+python run_benchmark.py \
+  --problem bgp_asn_misconfig \
+  --scenario dc_clos_bgp \
+  --topo-size s
+```
+
+Full example with custom settings
+
+```shell
+python run_benchmark.py \
+  --problem bgp_asn_misconfig \
+  --scenario dc_clos_bgp \
+  --topo-size s\
+  --agent-type react \
+  --backend-model gpt-5-mini \
+  --max-steps 30 \
+  --judge-model qgpt-5-mini \
+  --destroy-env
+```
 
 <h1 id="🛠️usage">🛠️ Usage</h1>
 

@@ -21,7 +21,7 @@ def load_model(backend_model: str = "gpt-oss:20b") -> BaseChatModel:
         llm = ChatOpenAI(
             model_name=backend_model,
         )
-    elif backend_model in ["deepseek-chat", "deepseek-reasoner"]:
+    elif backend_model in ["deepseek-chat"]:
         llm = ChatDeepSeek(
             model=backend_model,
             base_url="https://api.deepseek.com",

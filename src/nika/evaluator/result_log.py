@@ -4,8 +4,9 @@ from dataclasses import asdict, dataclass
 
 from dotenv import load_dotenv
 
+from nika.config import RESULTS_DIR
+
 load_dotenv()
-RESULTS_DIR = os.getenv("RESULTS_DIR")
 
 
 @dataclass

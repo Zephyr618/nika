@@ -349,6 +349,6 @@ class BGPHijackingRCA(BGPHijackingBase, RCATask):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    task = StaticBlackHoleBase(scenario_name="dc_clos_service")
-    # task.inject_fault()
-    task.recover_fault()
+    task = BGPAsnMisconfigBase(scenario_name="dc_clos_bgp")
+    task.inject_fault()
+    # task.recover_fault()

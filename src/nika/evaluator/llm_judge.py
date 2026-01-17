@@ -9,11 +9,10 @@ from pydantic import BaseModel, Field
 # from agent.llm.langchain_deepseek import DeepSeekLLM
 from agent.llm.model_factory import load_model
 from agent.utils.template import LLM_JUDGE_PROMPT_TEMPLATE
+from nika.config import RESULTS_DIR
 from nika.orchestrator.problems.prob_pool import get_problem_instance
 
 load_dotenv()
-
-RESULTS_DIR = os.getenv("RESULTS_DIR")
 
 
 class Score(BaseModel):

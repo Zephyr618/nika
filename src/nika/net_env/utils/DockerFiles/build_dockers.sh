@@ -1,7 +1,11 @@
-# Build Docker images for all services
+#!/usr/bin/env bash
+set -euo pipefail
 
-docker build -f Dockerfile.frr -t kathara/frr-stress .
-docker build -f Dockerfile.base -t kathara/base-stress .
-docker build -f Dockerfile.ryu -t kathara/ryu-stress .
-docker build -f Dockerfile.nginx -t kathara/nginx-stress .
-docker build -f Dockerfile.wireguard -t kathara/wireguard .
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Build Docker images for all services
+docker build -f "$BASE_DIR/Dockerfile.frr" -t kathara/frr-stress "$BASE_DIR"
+docker build -f "$BASE_DIR/Dockerfile.base" -t kathara/base-stress "$BASE_DIR"
+docker build -f "$BASE_DIR/Dockerfile.ryu" -t kathara/ryu-stress "$BASE_DIR"
+docker build -f "$BASE_DIR/Dockerfile.nginx" -t kathara/nginx-stress "$BASE_DIR"
+docker build -f "$BASE_DIR/Dockerfile.wireguard" -t kathara/wireguard "$BASE_DIR"
