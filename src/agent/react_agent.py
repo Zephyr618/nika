@@ -39,7 +39,7 @@ class AgentState(TypedDict):
 
 
 class BasicReActAgent:
-    def __init__(self, backend_model, max_steps: int = 20):
+    def __init__(self, llm_backend: str = "openai", model: str = "gpt-5-mini", max_steps: int = 20):
         self.max_steps = max_steps
 
         # Set up Langfuse callback handler
@@ -55,11 +55,11 @@ class BasicReActAgent:
             system_logger.warning("Authentication to Langfuse failed. Please check your LANGFUSE_API_KEY.")
 
         # load agent and tools
-        diagnosis_agent = DiagnosisAgent(backend_model=backend_model)
+        diagnosis_agent = DiagnosisAgent(llm_backend=llm_backend, model=model)
         asyncio.run(diagnosis_agent.load_tools())
         self.diagnosis_agent = diagnosis_agent.get_agent()
 
-        submission_agent = SubmissionAgent(backend_model=backend_model)
+        submission_agent = SubmissionAgent(llm_backend=llm_backend, model=model)
         asyncio.run(submission_agent.load_tools())
         self.submission_agent = submission_agent.get_agent()
 
@@ -95,7 +95,7 @@ class BasicReActAgent:
                 "scenario": self.session.scenario_name,
                 "problem": self.session.problem_names[0],
                 "topo_size": self.session.scenario_topo_size,
-                "backend_model": self.session.backend_model,
+                "model": self.session.model,
             },
         ):
             result = await self.graph.ainvoke(

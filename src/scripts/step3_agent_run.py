@@ -7,25 +7,26 @@ from nika.utils.logger import system_logger
 from nika.utils.session import Session
 
 
-def _agent_selector(agent_type: str, backend_model: str, max_steps: int = 20):
+def _agent_selector(agent_type: str, llm_backend: str, model: str, max_steps: int = 20):
     match agent_type.lower():
         case "react":
-            return BasicReActAgent(backend_model=backend_model, max_steps=max_steps)
+            return BasicReActAgent(llm_backend=llm_backend, model=model, max_steps=max_steps)
         case _:
             pass
 
 
-def start_agent(agent_type: str, backend_model: str, max_steps: int):
+def start_agent(agent_type: str, llm_backend: str, model: str, max_steps: int):
     logger = system_logger
 
     session = Session()
     session.load_running_session()
     session.update_session("agent_type", agent_type)
-    session.update_session("backend_model", backend_model)
+    session.update_session("llm_backend", llm_backend)
+    session.update_session("model", model)
     session.start_session()
 
-    logger.info(f"Starting agent: {agent_type}  with backend {backend_model} in session {session.session_id}")
-    agent = _agent_selector(agent_type, backend_model, max_steps=max_steps)
+    logger.info(f"Starting agent: {agent_type}  with backend {model} in session {session.session_id}")
+    agent = _agent_selector(agent_type, llm_backend, model, max_steps=max_steps)
     asyncio.run(agent.run(task_description=session.task_description))
 
     # stop session
@@ -50,10 +51,17 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--backend_model",
+        "--llm_backend",
         type=str,
-        default="gpt-oss:20b",
-        help="Backend model for the agent (default: gpt-oss:20b)",
+        default="openai",
+        help="LLM backend for the agent, options: openai (default), ollama, deepseek.",
+    )
+
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="gpt-5-mini",
+        help="Backend model for the agent (default: gpt-5-mini)",
     )
 
     parser.add_argument(
@@ -64,4 +72,4 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    start_agent(args.agent_type, args.backend_model, args.max_steps)
+    start_agent(args.agent_type, args.llm_backend, args.model, args.max_steps)

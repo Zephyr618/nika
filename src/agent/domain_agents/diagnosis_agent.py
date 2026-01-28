@@ -21,11 +21,11 @@ OVERALL_DIAGNOSIS_PROMPT = """\
 class DiagnosisAgent:
     """An agent that performs the total process of network diagnosis using the ReAct framework."""
 
-    def __init__(self, backend_model: str = "gpt-oss:20b"):
+    def __init__(self, llm_backend: str = "openai", model: str = "gpt-5-mini"):
         mcp_server_config = MCPServerConfig().load_config(if_submit=False)
         self.client = MultiServerMCPClient(connections=mcp_server_config)
         self.tools = None
-        self.llm = load_model(backend_model=backend_model)
+        self.llm = load_model(llm_backend=llm_backend, model=model)
 
     async def load_tools(self):
         self.tools: list[StructuredTool] = await self.client.get_tools()

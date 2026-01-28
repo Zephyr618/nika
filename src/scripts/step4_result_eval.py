@@ -67,7 +67,7 @@ def generic_eval(gt, submission):
     )
 
 
-def _eval_problem(session: Session, judge_model: str):
+def _eval_problem(session: Session, judge_llm_backend: str, judge_model: str):
     """Evaluate the problem solution and log the results."""
     gt = f"{session.session_dir}/ground_truth.json"
     gt = json.loads(open(gt, "r").read())
@@ -99,7 +99,7 @@ def _eval_problem(session: Session, judge_model: str):
     logger.info(f"Evaluating session {session.session_id} using LLM-as-Judge.")
 
     # llm as judge evaluation
-    llm_judge = LLMJudge(judge_model=judge_model)
+    llm_judge = LLMJudge(judge_llm_backend=judge_llm_backend, judge_model=judge_model)
     judge_response: JudgeResponse = llm_judge.evaluate_agent(
         ground_truth=textwrap.dedent(f"""\
                 The root cause is {gt["root_cause_name"]}.
@@ -130,10 +130,13 @@ def _eval_problem(session: Session, judge_model: str):
         problem_names=session.problem_names, task_level="detection", scenario_name=session.scenario_name
     )
 
+    if session.end_time is None:
+        session.end_session()
+
     # log evaluation results
     eval_result = EvalResult(
         agent_type=session.agent_type,
-        backend_model=session.backend_model,
+        model=session.model,
         root_cause_category=problem.root_cause_category,
         root_cause_name=problem.root_cause_name,
         net_env=session.scenario_name,
@@ -165,14 +168,14 @@ def _eval_problem(session: Session, judge_model: str):
     record_eval_result(eval_result)
 
 
-def eval_results(judge_model, destroy_env=True):
+def eval_results(judge_llm_backend, judge_model, destroy_env=True):
     """
     Destroy the network environment associated with the current session.
     """
     session = Session()
     session.load_running_session()
 
-    _eval_problem(session, judge_model)
+    _eval_problem(session, judge_llm_backend, judge_model)
     net_env = get_net_env_instance(session.scenario_name)
     if destroy_env and net_env.lab_exists():
         net_env.undeploy()
@@ -184,12 +187,20 @@ def eval_results(judge_model, destroy_env=True):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluate agent results.")
     parser.add_argument(
+        "--judge_llm_backend",
+        type=str,
+        nargs="?",
+        default="openai",
+        help="LLM backend used for judgment (default: openai)",
+    )
+
+    parser.add_argument(
         "--judge_model",
         type=str,
         nargs="?",
-        default="qwen3:32b",
-        help="LLM model used for judgment (default: qwen3:32b)",
+        default="gpt-5-mini",
+        help="LLM model used for judgment (default: gpt-5-mini)",
     )
     args = parser.parse_args()
 
-    eval_results(judge_model=args.judge_model)
+    eval_results(judge_llm_backend=args.judge_llm_backend, judge_model=args.judge_model)

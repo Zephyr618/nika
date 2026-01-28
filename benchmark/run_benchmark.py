@@ -16,8 +16,10 @@ def run_single_benchmark(
     scenario: str,
     topo_size: str,
     agent_type: str,
-    backend_model: str,
+    llm_backend: str,
+    model: str,
     max_steps: int,
+    judge_llm_backend: str,
     judge_model: str,
     destroy_env: bool,
 ):
@@ -29,8 +31,10 @@ def run_single_benchmark(
         scenario: Network scenario name
         topo_size: Topology size
         agent_type: Agent type (e.g., react)
-        backend_model: LLM backend model
+        llm_backend: The LLM backend to use (e.g. openai, ollama, deepseek)
+        model: LLM backend model
         max_steps: Maximum agent steps
+        judge_llm_backend: LLM backend used for evaluation
         judge_model: Model used for evaluation
         destroy_env: Whether to destroy the network environment after evaluation
     """
@@ -46,12 +50,13 @@ def run_single_benchmark(
     # Step 3: Start agent
     start_agent(
         agent_type=agent_type,
-        backend_model=backend_model,
+        llm_backend=llm_backend,
+        model=model,
         max_steps=max_steps,
     )
 
     # Step 4: Evaluate results
-    eval_results(judge_model=judge_model, destroy_env=destroy_env)
+    eval_results(judge_llm_backend=judge_llm_backend, judge_model=judge_model, destroy_env=destroy_env)
 
     # Step 5: Cleanup environment if required
     if destroy_env:
@@ -63,7 +68,8 @@ def run_single_benchmark(
 def run_benchmark_from_csv(
     benchmark_file: str,
     agent_type: str,
-    backend_model: str,
+    llm_backend: str,
+    model: str,
     max_steps: int,
     judge_model: str,
     destroy_env: bool,
@@ -86,7 +92,8 @@ def run_benchmark_from_csv(
                 scenario=row["scenario"],
                 topo_size=row["topo_size"],
                 agent_type=agent_type,
-                backend_model=backend_model,
+                llm_backend=llm_backend,
+                model=model,
                 max_steps=max_steps,
                 judge_model=judge_model,
                 destroy_env=destroy_env,
@@ -111,17 +118,19 @@ def main():
 
     parser.add_argument("--problem", type=str, help="Problem name")
     parser.add_argument("--scenario", type=str, help="Scenario name")
-    parser.add_argument("--topo-size", type=str, help="Topology size")
+    parser.add_argument("--topo_size", type=str, help="Topology size")
 
     # ===== Agent configuration =====
-    parser.add_argument("--agent-type", type=str, default="react")
-    parser.add_argument("--backend-model", type=str, default="gpt-5-mini")
-    parser.add_argument("--max-steps", type=int, default=20)
+    parser.add_argument("--agent_type", type=str, default="react")
+    parser.add_argument("--llm_backend", type=str, default="openai")
+    parser.add_argument("--model", type=str, default="gpt-5-mini")
+    parser.add_argument("--max_steps", type=int, default=20)
 
     # ===== Evaluation configuration =====
-    parser.add_argument("--judge-model", type=str, default="gpt-5-mini")
+    parser.add_argument("--judge_llm_backend", type=str, default="openai")
+    parser.add_argument("--judge_model", type=str, default="gpt-5-mini")
     parser.add_argument(
-        "--destroy-env",
+        "--destroy_env",
         action="store_true",
         help="Destroy the network environment after evaluation",
     )
@@ -136,8 +145,10 @@ def main():
             scenario=args.scenario,
             topo_size=args.topo_size,
             agent_type=args.agent_type,
-            backend_model=args.backend_model,
+            llm_backend=args.llm_backend,
+            model=args.model,
             max_steps=args.max_steps,
+            judge_llm_backend=args.judge_llm_backend,
             judge_model=args.judge_model,
             destroy_env=args.destroy_env,
         )
@@ -146,8 +157,10 @@ def main():
         run_benchmark_from_csv(
             benchmark_file=args.benchmark_csv,
             agent_type=args.agent_type,
-            backend_model=args.backend_model,
+            llm_backend=args.llm_backend,
+            model=args.model,
             max_steps=args.max_steps,
+            judge_llm_backend=args.judge_llm_backend,
             judge_model=args.judge_model,
             destroy_env=args.destroy_env,
         )

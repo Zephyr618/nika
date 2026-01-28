@@ -12,7 +12,7 @@ load_dotenv()
 @dataclass
 class EvalResult:
     agent_type: str = None
-    backend_model: str = None
+    model: str = None
     root_cause_category: str = None
     root_cause_name: str = None
     net_env: str = None

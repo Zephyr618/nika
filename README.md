@@ -112,27 +112,48 @@ bash src/nika/net_env/utils/DockerFiles/build_dockers.sh
 You can follow the steps below to run a complete troubleshooting task with NIKA.
 
 1. **Start the network environment**
-  Check the specific scenario and its parameters under `llm4netlab/net_env`.
+  Check the specific scenario and its parameters under `src/nika/net_env`.
    ```shell
-   python3 src/scripts/step1_net_env_start.py --scenario <scenario_name> --topo_size <topo_size>
+   python3 src/scripts/step1_net_env_start.py --scenario <scenario> --topo_size <topo_size>
+
+   # Example:
+   python3 src/scripts/step1_net_env_start.py --scenario simple_bgp --topo_size s
    ```
 
 2. **Inject faults into the network environment**
 
    ```shell
    python3 src/scripts/step2_failure_inject.py --problem <problem_id>
+
+   # Example:
+   python3 src/scripts/step2_failure_inject.py --problem frr_service_down
    ```
 
 3. **Run the AI agent to troubleshoot the network**
     ```shell
-    python3 src/scripts/step3_agent_run.py --agent_type <agent_type> --backend_model <backend_model> --max_steps <max_steps>
+    python3 src/scripts/step3_agent_run.py --agent_type <agent_type> --llm_backend <llm_backend> --model <model> --max_steps <max_steps>
+
+    # Example:
+    python3 src/scripts/step3_agent_run.py --agent_type react --llm_backend openai --model gpt-5-mini --max_steps 20
     ```
 
 4. **Evaluate the agent's performance**
 
     ```shell
-    python3 src/scripts/step4_result_eval.py --judge_model <judge_model>
+    python3 src/scripts/step4_result_eval.py --judge_llm_backend <judge_llm_backend> --judge_model <judge_model>
+
+    # Example:
+    python3 src/scripts/step4_result_eval.py --judge_llm_backend openai --judge_model gpt-5-mini
     ```
+
+**Command-line arguments**
+- <scenario>: Name of the network scenario to start (default: simple_bgp). Full list in `src/nika/net_env` and `benchmark/benchmark_selected.csv`.
+- <topo_size>: Topology size (s/m/l). Only required for certain scenarios.
+- <problem_id>: ID of the problem to inject (default: frr_service_down). Full list in `src/nika/orchestrator/problems` and `benchmark/benchmark_selected.csv`.
+- <llm_backend>, <judge_llm_backend>: The LLM backend to use (e.g. openai, ollama, deepseek). Extend `src/agent/llm/model_factory.py` to include more.
+- <model>, <judge_model>: LLM backend model to use (e.g. gpt-4).
+- <agent_type>: Type of the AI agent to use (for now only **react** is supported).
+- <max_steps>: Maximum steps for the agent to take (default: 20).
 
 ### Benchmark Runner
 
@@ -147,7 +168,7 @@ Alternatively, you can run the `benchmark/run_benchmark.py` script to execute al
     or specify a CSV file:
 
     ```shell
-    python3 benchmark/run_benchmark.py --benchmark-csv ./benchmark_selected.csv
+    python3 benchmark/run_benchmark.py --benchmark_csv ./benchmark_selected.csv
     ```
     **CSV format requirements**
 
@@ -168,7 +189,7 @@ To run one specific benchmark, you must provide all three of the following argum
     python3 benchmark/run_benchmark.py \
       --problem bgp_asn_misconfig \
       --scenario dc_clos_bgp \
-      --topo-size s
+      --topo_size s
     ```
 
 3. Full example with custom settings
@@ -177,12 +198,14 @@ To run one specific benchmark, you must provide all three of the following argum
     python3 benchmark/run_benchmark.py \
       --problem bgp_asn_misconfig \
       --scenario dc_clos_bgp \
-      --topo-size s\
-      --agent-type react \
-      --backend-model gpt-5-mini \
-      --max-steps 30 \
-      --judge-model gpt-5-mini \
-      --destroy-env
+      --topo_size s\
+      --agent_type react \
+      --llm_backend openai \
+      --model gpt-5-mini \
+      --max_steps 30 \
+      --judge_llm_backend gpt-5-mini \
+      --judge_model gpt-5-mini \
+      --destroy_env
     ```
 
 <h1 id="🛠️usage">🛠️ Usage</h1>

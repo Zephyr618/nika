@@ -6,12 +6,12 @@ from nika.utils.logger import refresh_logger, system_logger
 from nika.utils.session import Session
 
 
-def start_net_env(scenario_name: str, topo_size: Literal["s", "m", "l"] | None = None, redeploy: bool = True):
+def start_net_env(scenario: str, topo_size: Literal["s", "m", "l"] | None = None, redeploy: bool = True):
     """
     Every run starts a new session.
     """
     refresh_logger()
-    net_env = get_net_env_instance(scenario_name, topo_size=topo_size)
+    net_env = get_net_env_instance(scenario, topo_size=topo_size)
     if net_env.lab_exists() and redeploy:
         net_env.undeploy()
         net_env.deploy()
@@ -21,11 +21,9 @@ def start_net_env(scenario_name: str, topo_size: Literal["s", "m", "l"] | None =
     # save session data for follow-up steps
     session = Session()
     session.init_session()
-    session.update_session("scenario_name", scenario_name)
+    session.update_session("scenario_name", scenario)
     session.update_session("scenario_topo_size", topo_size)
-    system_logger.info(
-        f"Started network environment: {scenario_name} with size {topo_size} in session {session.session_id}"
-    )
+    system_logger.info(f"Started network environment: {scenario} with size {topo_size} in session {session.session_id}")
     return net_env
 
 

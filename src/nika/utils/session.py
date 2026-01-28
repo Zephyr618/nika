@@ -13,7 +13,8 @@ def generate_code():
 
 class Session:
     def __init__(self) -> None:
-        pass
+        self.start_time = None
+        self.end_time = None
 
     def init_session(self):
         self.session_id = generate_code()
@@ -71,7 +72,7 @@ if __name__ == "__main__":
     session.update_session("lab_name", "test_lab")
     session.update_session("root_cause_category", "connectivity")
     session.update_session("root_cause_name", "missing_route")
-    session.update_session("backend_model", "gpt-4")
+    session.update_session("model", "gpt-4")
     session.update_session("agent_type", "default_agent")
 
     session._write_session()

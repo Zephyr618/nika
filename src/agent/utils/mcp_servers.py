@@ -50,7 +50,7 @@ class MCPServerConfig:
                 "LAB_SESSION_ID": self.session.session_id,
                 "root_cause_name": self.session.root_cause_name,
                 "LAB_NAME": self.session.scenario_name,
-                "backend_model": self.session.backend_model,
+                "model": self.session.model,
                 "agent_type": self.session.agent_type,
             }
         return config
