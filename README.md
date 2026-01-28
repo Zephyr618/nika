@@ -114,64 +114,76 @@ You can follow the steps below to run a complete troubleshooting task with NIKA.
 1. **Start the network environment**
   Check the specific scenario and its parameters under `llm4netlab/net_env`.
    ```shell
-   python3 scripts/step1_net_env_start.py --scenario <scenario_name> --scenario_params key1=value1 key2=value2
+   python3 src/scripts/step1_net_env_start.py --scenario <scenario_name> --topo_size <topo_size>
    ```
 
 2. **Inject faults into the network environment**
 
    ```shell
-   python3 scripts/step2_failure_inject.py --problem <problem_id>
+   python3 src/scripts/step2_failure_inject.py --problem <problem_id>
    ```
 
 3. **Run the AI agent to troubleshoot the network**
     ```shell
-    python3 scripts/step3_agent_run.py --agent_type <agent_type> --backend_model <backend_model> --max_steps <max_steps>
+    python3 src/scripts/step3_agent_run.py --agent_type <agent_type> --backend_model <backend_model> --max_steps <max_steps>
     ```
 
 4. **Evaluate the agent's performance**
 
     ```shell
-    python3 scripts/step4_result_eval.py --judge_model <judge_model>
+    python3 src/scripts/step4_result_eval.py --judge_model <judge_model>
     ```
 
 ### Benchmark Runner
 
 Alternatively, you can run the `benchmark/run_benchmark.py` script to execute all steps for all predefined incidents in the benchmark suite. This script will automatically start the network environment, inject faults, run the AI agent, and evaluate the results.
 
-1. Run benchmarks from CSV (default)
+1. Run benchmarks from a CSV file (default mode). By default, the script runs all benchmark cases defined in `benchmark/benchmark_selected.csv` file.
 
-```shell
-python run_benchmark.py
-```
+    ```shell
+    python3 benchmark/run_benchmark.py
+    ```
 
-or specify a CSV file:
+    or specify a CSV file:
 
-```shell
-python run_benchmark.py --benchmark-csv ./benchmark.csv
-```
+    ```shell
+    python3 benchmark/run_benchmark.py --benchmark-csv ./benchmark_selected.csv
+    ```
+    **CSV format requirements**
 
-Run a single benchmark
+    The CSV file must contain **problem, scenario, and topo_size** columns. Example:
 
-```shell
-python run_benchmark.py \
-  --problem bgp_asn_misconfig \
-  --scenario dc_clos_bgp \
-  --topo-size s
-```
+    ```csv
+    problem,scenario,topo_size
+    bgp_asn_misconfig,dc_clos_bgp,s
+    link_down,dc_clos_bgp,m
+    ```
 
-Full example with custom settings
+    Each row in the CSV will be executed sequentially using the same agent and evaluation configuration.
 
-```shell
-python run_benchmark.py \
-  --problem bgp_asn_misconfig \
-  --scenario dc_clos_bgp \
-  --topo-size s\
-  --agent-type react \
-  --backend-model gpt-5-mini \
-  --max-steps 30 \
-  --judge-model qgpt-5-mini \
-  --destroy-env
-```
+2. Run a single benchmark
+To run one specific benchmark, you must provide all three of the following arguments:
+
+    ```shell
+    python3 benchmark/run_benchmark.py \
+      --problem bgp_asn_misconfig \
+      --scenario dc_clos_bgp \
+      --topo-size s
+    ```
+
+3. Full example with custom settings
+
+    ```shell
+    python3 benchmark/run_benchmark.py \
+      --problem bgp_asn_misconfig \
+      --scenario dc_clos_bgp \
+      --topo-size s\
+      --agent-type react \
+      --backend-model gpt-5-mini \
+      --max-steps 30 \
+      --judge-model gpt-5-mini \
+      --destroy-env
+    ```
 
 <h1 id="🛠️usage">🛠️ Usage</h1>
 

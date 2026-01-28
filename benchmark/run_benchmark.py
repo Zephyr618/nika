@@ -14,7 +14,7 @@ cur_dir = os.path.dirname(os.path.abspath(__file__))
 def run_single_benchmark(
     problem: str,
     scenario: str,
-    topo_size: int,
+    topo_size: str,
     agent_type: str,
     backend_model: str,
     max_steps: int,
@@ -84,7 +84,7 @@ def run_benchmark_from_csv(
             run_single_benchmark(
                 problem=row["problem"],
                 scenario=row["scenario"],
-                topo_size=int(row["topo_size"]),
+                topo_size=row["topo_size"],
                 agent_type=agent_type,
                 backend_model=backend_model,
                 max_steps=max_steps,
@@ -105,7 +105,7 @@ def main():
     parser.add_argument(
         "--benchmark-csv",
         type=str,
-        default=os.path.join(cur_dir, "benchmark.csv"),
+        default=os.path.join(cur_dir, "benchmark_selected.csv"),
         help="Path to benchmark CSV file",
     )
 
@@ -115,11 +115,11 @@ def main():
 
     # ===== Agent configuration =====
     parser.add_argument("--agent-type", type=str, default="react")
-    parser.add_argument("--backend-model", type=str, default="deepseek-chat")
+    parser.add_argument("--backend-model", type=str, default="gpt-5-mini")
     parser.add_argument("--max-steps", type=int, default=20)
 
     # ===== Evaluation configuration =====
-    parser.add_argument("--judge-model", type=str, default="deepseek-chat")
+    parser.add_argument("--judge-model", type=str, default="gpt-5-mini")
     parser.add_argument(
         "--destroy-env",
         action="store_true",
