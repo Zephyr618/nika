@@ -1,0 +1,1 @@
+{"is_anomaly": true, "faulty_devices": ["host_1_2_3_1", "host_2_3_3_1", "host_2_4_2_3", "host_2_4_4_1", "access_switches_serving_subnets_1.2.3.0/24_2.3.3.0/24_2.4.2.0/24_2.4.4.0/24"], "root_cause_name": ["link_bandwidth_throttling", "link_high_packet_corruption", "receiver_resource_contention"]}

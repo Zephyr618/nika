@@ -1,0 +1,1 @@
+{"is_anomaly": false, "faulty_devices": ["load_balancer"], "root_cause_name": ["ospf_missing_route_advertisement"]}

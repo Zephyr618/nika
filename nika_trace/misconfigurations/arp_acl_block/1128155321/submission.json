@@ -1,0 +1,1 @@
+{"is_anomaly": true, "faulty_devices": ["host_1_1_1_1", "host_2_1_1_1", "dhcp_server", "router_dist_1_1", "router_dist_2_1", "load_balancer"], "root_cause_name": ["host_missing_ip", "dhcp_service_down", "icmp_acl_block"]}

@@ -1,0 +1,10 @@
+{
+    "is_anomaly": true,
+    "faulty_devices": [
+        "web_server_1_1",
+        "vpn_server_1"
+    ],
+    "root_cause_name": [
+        "host_vpn_membership_missing"
+    ]
+}

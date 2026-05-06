@@ -1,0 +1,1 @@
+{"is_anomaly": true, "faulty_devices": ["web_server_3 (10.200.0.6)"], "root_cause_name": ["link_bandwidth_throttling"]}

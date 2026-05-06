@@ -1,0 +1,1 @@
+{"is_anomaly": true, "faulty_devices": ["access_switch_serving_10.1.2.0/24", "access_switch_serving_10.2.2.0/24"], "root_cause_name": ["link_bandwidth_throttling", "incast_traffic_network_limitation", "receiver_resource_contention"]}

@@ -1,0 +1,1 @@
+{"is_anomaly": true, "faulty_devices": ["server_access_router", "dns_server", "router_core_1", "router_dist_1_1", "load_balancer", "web_server_0", "web_server_1", "web_server_2", "web_server_3"], "root_cause_name": ["dns_record_error", "ospf_area_misconfiguration", "load_balancer_overload", "receiver_resource_contention"]}

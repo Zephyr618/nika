@@ -1,0 +1,1 @@
+{"is_anomaly": true, "faulty_devices": ["switch_1", "switch_2"], "root_cause_name": ["p4_table_entry_missing", "southbound_port_mismatch"]}

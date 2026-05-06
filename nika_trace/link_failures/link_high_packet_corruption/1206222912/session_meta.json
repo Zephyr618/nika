@@ -1,0 +1,15 @@
+{
+    "session_id": "1206222912",
+    "scenario_name": "dc_clos_bgp",
+    "scenario_topo_size": "m",
+    "problem_names": [
+        "link_high_packet_corruption"
+    ],
+    "root_cause_name": "link_high_packet_corruption",
+    "session_dir": "/home/ubuntu/codes/LLM4NetLab/results/link_high_packet_corruption/1206222912",
+    "task_description": "You are provided with the following network description and its current state:\nNetwork Description: A multi-tier data center Clos (fat-tree) topology using EBGP. Super-spine routers (AS 65000) connect to all spine routers.Each pod contains multiple spines and leaves; spines peer with super-spines and all leaves in their pod. Each leaf connects to one host via a /24 subnet (10.<pod>.<leaf>.0/24) and advertises this network via BGP. All inter-router links use /31 subnets from 172.16.0.0/16. Routing is entirely EBGP using FRR.\nHosts: pc_0_0, pc_0_1\nRouters (FRRRouting): leaf_router_0_0, leaf_router_0_1, spine_router_0_0, spine_router_0_1, super_spine_router_0\nTopology: (leaf_router_0_0:eth2, pc_0_0:eth0), (leaf_router_0_1:eth2, pc_0_1:eth0), (spine_router_0_0:eth1, leaf_router_0_0:eth0), (spine_router_0_0:eth2, leaf_router_0_1:eth0), (spine_router_0_1:eth1, leaf_router_0_0:eth1), (spine_router_0_1:eth2, leaf_router_0_1:eth1), (super_spine_router_0:eth0, spine_router_0_0:eth0), (super_spine_router_0:eth1, spine_router_0_1:eth0)\n\nYour goal is to analyze the network condition and, if needed, use the available tools.\nYou need to generate a troubeshooting diagnosis report.\nThe report should reflect your assessment of the network's health, indicate any abnormal behavior you identify, and describe relevant findings based on your analysis.\n\nFocus on producing an informative and coherent diagnostic report derived from the network state.\nDo not need to propose any solutions or remediation steps at this stage.",
+    "agent_type": "react",
+    "backend_model": "gpt-5",
+    "start_time": 1765060156.511035,
+    "end_time": 1765060395.45815
+}
