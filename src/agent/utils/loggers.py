@@ -74,6 +74,10 @@ class FileLoggerHandler(BaseCallbackHandler):
                 if message:
                     payload["invalid_tool_calls"] = getattr(message, "invalid_tool_calls", None)
                     payload["usage_metadata"] = getattr(message, "usage_metadata", None)
+                    # 保留 V4 thinking 模型的链式推理（reasoning_content）
+                    add_kwargs = getattr(message, "additional_kwargs", None) or {}
+                    if add_kwargs.get("reasoning_content"):
+                        payload["reasoning_content"] = add_kwargs["reasoning_content"]
                 self._log("llm_end", payload)
         except Exception as e:
             self._log(
