@@ -108,10 +108,13 @@ class BasicReActAgent:
 
     async def diagnosis_agent_builder(self, state: AgentState):
         try:
+            callbacks = [FileLoggerHandler(name="diagnosis_agent")]
+            if self.langfuse_handler is not None:
+                callbacks.append(self.langfuse_handler)
             diagnosis_report = await self.diagnosis_agent.ainvoke(
                 {"messages": state["messages"]},
                 config={
-                    "callbacks": [FileLoggerHandler(name="diagnosis_agent")],
+                    "callbacks": callbacks,
                     "recursion_limit": self.max_steps,
                 },
                 debug=True,
@@ -137,6 +140,9 @@ class BasicReActAgent:
 
     async def submission_agent_builder(self, state: AgentState):
         diag_text = state["diagnosis_report"][-1]
+        callbacks = [FileLoggerHandler(name="submission_agent")]
+        if self.langfuse_handler is not None:
+            callbacks.append(self.langfuse_handler)
         result = await self.submission_agent.ainvoke(
             {
                 "messages": [
@@ -146,7 +152,7 @@ class BasicReActAgent:
                 ]
             },
             config={
-                "callbacks": [FileLoggerHandler(name="submission_agent")],
+                "callbacks": callbacks,
                 "recursion_limit": self.max_steps,
             },
             debug=True,

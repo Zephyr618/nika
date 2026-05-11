@@ -208,6 +208,19 @@ def render_html(events: list[dict], log_path: Path) -> str:
     white-space: pre; word-break: normal;
   }}
 
+  /* V4 thinking 模型的链式推理（reasoning_content）*/
+  .thinking {{ margin: 4px 0 8px 0; font-size: 12px; }}
+  .thinking summary {{
+    color: #6b21a8; font-style: italic; user-select: none;
+  }}
+  .thinking pre {{
+    background: #faf5ff; border-left: 3px solid #b39ddb;
+    padding: 8px 12px; margin: 6px 0 0 0;
+    white-space: pre-wrap; word-break: normal;
+    color: #4c1d95; font-size: 12px; line-height: 1.5;
+    border-radius: 0 4px 4px 0;
+  }}
+
   .divider {{
     text-align: center; color: #aaa; font-size: 11px; margin: 16px 0;
   }}
@@ -244,6 +257,7 @@ def render_html(events: list[dict], log_path: Path) -> str:
 
         elif kind == "llm_end":
             text = ev.get("text", "") or "(empty)"
+            reasoning = ev.get("reasoning_content") or ""
             usage = ev.get("usage_metadata") or {}
             in_t = usage.get("input_tokens")
             out_t = usage.get("output_tokens")
@@ -262,10 +276,17 @@ def render_html(events: list[dict], log_path: Path) -> str:
                 if badges
                 else ""
             )
+            # 渲染 thinking 推理（如果有）
+            thinking_html = (
+                f'<details class="thinking" open><summary>💭 thinking ({len(reasoning)} chars)</summary>'
+                f'<pre>{html.escape(reasoning)}</pre></details>'
+                if reasoning else ""
+            )
             parts.append(
                 f"""  <div class="turn right">
     <div class="bubble agent">
       <div class="ts">🤖 agent · {html.escape(ts_short)}</div>
+      {thinking_html}
       <div class="body">{html.escape(text)}</div>
       {badge_html}
     </div>
