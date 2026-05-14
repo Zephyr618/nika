@@ -74,40 +74,67 @@ def extract_tool_name_from_output(output_str: str) -> str | None:
     return m.group(1) if m else None
 
 
-def extract_text_from_tool_output(output_str: str) -> str:
-    """Best-effort: pull the inner 'text' field out of a langchain ToolMessage repr.
+def _parse_single_text_value(output_str: str, start: int) -> tuple[str, int]:
+    """从 start 位置开始（紧跟 "'text': '" 之后）解析一个 quoted Python string。
 
-    Format looks like: content=[{'type': 'text', 'text': '<JSON or text>', 'id': ...}]
-    We try to locate "'text': '" and read until the matching unescaped "'".
-    Falls back to the raw string if parsing fails.
+    返回 (解析出的字符串, 结束后的 index)。处理 \\n / \\t / \\' / \\\\ 转义。
     """
-    key = "'text': '"
-    idx = output_str.find(key)
-    if idx < 0:
-        return output_str
-    i = idx + len(key)
-    out = []
+    i = start
+    buf: list[str] = []
     while i < len(output_str):
         c = output_str[i]
         if c == "\\" and i + 1 < len(output_str):
             nxt = output_str[i + 1]
             if nxt == "n":
-                out.append("\n")
+                buf.append("\n")
             elif nxt == "t":
-                out.append("\t")
+                buf.append("\t")
             elif nxt == "'":
-                out.append("'")
+                buf.append("'")
             elif nxt == "\\":
-                out.append("\\")
+                buf.append("\\")
             else:
-                out.append(nxt)
+                buf.append(nxt)
             i += 2
             continue
         if c == "'":
-            break
-        out.append(c)
+            return "".join(buf), i + 1
+        buf.append(c)
         i += 1
-    return "".join(out)
+    return "".join(buf), i
+
+
+def extract_text_from_tool_output(output_str: str) -> str:
+    """Pull ALL 'text' fields out of a langchain ToolMessage repr.
+
+    Format:
+      content=[{'type': 'text', 'text': '<...>', 'id': ...},
+               {'type': 'text', 'text': '<...>', 'id': ...}, ...]
+    For multi-text outputs (e.g. list_avail_problems returns 54 items),
+    concatenates all text values with newlines.
+    Single-text outputs (e.g. ping_pair) return as before.
+    Falls back to the raw string if no 'text' field is found.
+    """
+    key = "'text': '"
+    if key not in output_str:
+        return output_str
+
+    parts: list[str] = []
+    i = 0
+    while True:
+        idx = output_str.find(key, i)
+        if idx < 0:
+            break
+        value, next_i = _parse_single_text_value(output_str, idx + len(key))
+        parts.append(value)
+        i = next_i
+
+    if not parts:
+        return output_str
+    if len(parts) == 1:
+        return parts[0]
+    # 多项：用换行连接，方便阅读
+    return "\n".join(parts)
 
 
 def pretty_json(s: str) -> str:
