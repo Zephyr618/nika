@@ -7,7 +7,8 @@ from nika.config import BASE_DIR, RESULTS_DIR
 
 
 def generate_code():
-    time_str = datetime.now().strftime("%m%d%H%M%S")
+    # ISO-rich 格式: 2026-05-11_13-45-22（年-月-日_时-分-秒）
+    time_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     return time_str
 
 
@@ -18,6 +19,8 @@ class Session:
 
     def init_session(self):
         self.session_id = generate_code()
+        # 保存原始时间戳——session_id 后续会被改写成描述性名字，但 date_str 永远是原始时间
+        self.date_str = self.session_id
         os.makedirs(f"{BASE_DIR}/runtime", exist_ok=True)
 
     def load_running_session(self):
@@ -32,11 +35,18 @@ class Session:
 
     def update_session(self, key: str, value: str):
         setattr(self, key, value)
-        if hasattr(self, "problem_names") and hasattr(self, "session_id"):
+        if hasattr(self, "problem_names") and hasattr(self, "date_str"):
             if len(self.problem_names) > 1:
                 self.root_cause_name = "multiple_faults"
             else:
                 self.root_cause_name = self.problem_names[0]
+                # 用 date_str 作为不可变锚点，按当前已知字段拼描述性 session_id
+                parts = [self.date_str, self.root_cause_name]
+                if hasattr(self, "scenario_topo_size") and self.scenario_topo_size:
+                    parts.append(self.scenario_topo_size)
+                if hasattr(self, "faulty_host") and self.faulty_host:
+                    parts.append(self.faulty_host)
+                self.session_id = "_".join(parts)
                 self.session_dir = f"{RESULTS_DIR}/{self.root_cause_name}/{self.session_id}"
         self._write_session()
 

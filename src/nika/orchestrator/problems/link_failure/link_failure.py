@@ -20,12 +20,15 @@ class LinkFailureBase:
 
     symptom_desc = "Users report connectivity issues to other hosts."
 
-    def __init__(self, scenario_name: str | None, **kwargs):
+    def __init__(self, scenario_name: str | None, faulty_host: str | None = None, **kwargs):
         super().__init__()
         self.net_env = get_net_env_instance(scenario_name, **kwargs)
         self.kathara_api = KatharaBaseAPI(lab_name=self.net_env.lab.name)
         self.injector = FaultInjectorBase(lab_name=self.net_env.lab.name)
-        self.faulty_devices = [random.choice(self.net_env.hosts)]
+        if faulty_host:
+            self.faulty_devices = [faulty_host]
+        else:
+            self.faulty_devices = [random.choice(self.net_env.hosts)]
         self.faulty_intf = "eth0"
 
     def inject_fault(self):
@@ -80,12 +83,15 @@ class LinkFlapBase:
 
     symptom_desc = "Users report connectivity issues to other hosts."
 
-    def __init__(self, scenario_name: str | None, **kwargs):
+    def __init__(self, scenario_name: str | None, faulty_host: str | None = None, **kwargs):
         super().__init__()
         self.net_env = get_net_env_instance(scenario_name, **kwargs)
         self.kathara_api = KatharaBaseAPI(lab_name=self.net_env.lab.name)
         self.injector = FaultInjectorBase(lab_name=self.net_env.lab.name)
-        self.faulty_devices = [random.choice(self.net_env.hosts)]
+        if faulty_host:
+            self.faulty_devices = [faulty_host]
+        else:
+            self.faulty_devices = [random.choice(self.net_env.hosts)]
         self.faulty_intf = "eth0"
 
     def inject_fault(self):
@@ -142,12 +148,15 @@ class LinkDetachBase:
 
     symptom_desc = "Users report connectivity issues to other hosts."
 
-    def __init__(self, scenario_name: str | None, **kwargs):
+    def __init__(self, scenario_name: str | None, faulty_host: str | None = None, **kwargs):
         super().__init__()
         self.net_env = get_net_env_instance(scenario_name, **kwargs)
         self.kathara_api = KatharaBaseAPI(lab_name=self.net_env.lab.name)
         self.injector = FaultInjectorBase(lab_name=self.net_env.lab.name)
-        self.faulty_devices = [random.choice(self.net_env.hosts)]
+        if faulty_host:
+            self.faulty_devices = [faulty_host]
+        else:
+            self.faulty_devices = [random.choice(self.net_env.hosts)]
         self.faulty_intf = "eth0"
 
     def inject_fault(self):
@@ -202,12 +211,15 @@ class LinkFragBase:
 
     symptom_desc = "Users report partial packet loss when communicating with other hosts."
 
-    def __init__(self, scenario_name: str | None, **kwargs):
+    def __init__(self, scenario_name: str | None, faulty_host: str | None = None, **kwargs):
         super().__init__()
         self.net_env = get_net_env_instance(scenario_name, **kwargs)
         self.kathara_api = KatharaBaseAPI(lab_name=self.net_env.lab.name)
         self.injector = FaultInjectorBase(lab_name=self.net_env.lab.name)
-        self.faulty_devices = [random.choice(self.net_env.hosts)]
+        if faulty_host:
+            self.faulty_devices = [faulty_host]
+        else:
+            self.faulty_devices = [random.choice(self.net_env.hosts)]
 
     def inject_fault(self):
         self.injector.inject_fragmentation_disabled(host_name=self.faulty_devices[0], mtu=10)

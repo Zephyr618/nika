@@ -21,12 +21,15 @@ class LinkHighPacketCorruptionBase:
     root_cause_name: str = "link_high_packet_corruption"
     TAGS: str = ["link"]
 
-    def __init__(self, scenario_name: str | None, **kwargs):
+    def __init__(self, scenario_name: str | None, faulty_host: str | None = None, **kwargs):
         super().__init__()
         self.net_env = get_net_env_instance(scenario_name, **kwargs)
         self.kathara_api = KatharaAPIALL(lab_name=self.net_env.lab.name)
         self.injector = FaultInjectorTC(lab_name=self.net_env.lab.name)
-        self.faulty_devices = [random.choice(self.net_env.hosts)]
+        if faulty_host:
+            self.faulty_devices = [faulty_host]
+        else:
+            self.faulty_devices = [random.choice(self.net_env.hosts)]
 
     def inject_fault(self):
         intf_name = self.kathara_api.get_host_interfaces(self.faulty_devices[0])[-1]
@@ -79,12 +82,15 @@ class LinkBandwidthThrottlingBase:
     root_cause_name: str = "link_bandwidth_throttling"
     TAGS: str = ["link"]
 
-    def __init__(self, scenario_name: str | None, **kwargs):
+    def __init__(self, scenario_name: str | None, faulty_host: str | None = None, **kwargs):
         super().__init__()
         self.net_env = get_net_env_instance(scenario_name, **kwargs)
         self.kathara_api = KatharaAPIALL(lab_name=self.net_env.lab.name)
         self.injector = FaultInjectorTC(lab_name=self.net_env.lab.name)
-        self.faulty_devices = [random.choice(self.net_env.hosts)]
+        if faulty_host:
+            self.faulty_devices = [faulty_host]
+        else:
+            self.faulty_devices = [random.choice(self.net_env.hosts)]
         self.scenario_name = scenario_name
 
     def inject_fault(self):

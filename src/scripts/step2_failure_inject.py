@@ -8,9 +8,15 @@ from nika.utils.logger import system_logger
 from nika.utils.session import Session
 
 
-def inject_failure(problem_names: list[str], re_inject: bool = True):
+def inject_failure(problem_names: list[str], faulty_host: str | None = None, re_inject: bool = True):
     """
     Inject failure into the network environment based on the root cause name.
+
+    Args:
+        problem_names: list of problem names to inject.
+        faulty_host: optionally specify which host the fault is injected on.
+            If None (default), NIKA randomly picks a host (legacy behavior).
+        re_inject: whether to actually run inject_fault() (default True).
     """
     logger = system_logger
 
@@ -25,10 +31,14 @@ def inject_failure(problem_names: list[str], re_inject: bool = True):
             raise ValueError(f"Unknown problem name: {problem_name}")
 
     scenario_params = session.scenario_params if hasattr(session, "scenario_params") else {}
+    if faulty_host:
+        scenario_params = {**scenario_params, "faulty_host": faulty_host}
 
     tot_tasks = []
     for task_level in TaskLevel:
-        random.seed(session.session_id[-4:])
+        # 用 date_str（永久时间戳）做随机 seed，避免被 session_id 改写自指
+        seed_source = session.date_str if hasattr(session, "date_str") else session.session_id
+        random.seed(seed_source[-4:])
         problem = get_problem_instance(
             problem_names=problem_names, task_level=task_level, scenario_name=session.scenario_name, **scenario_params
         )
@@ -36,6 +46,10 @@ def inject_failure(problem_names: list[str], re_inject: bool = True):
 
     if re_inject:
         tot_tasks[0].inject_fault()
+
+    # 记录实际选中的 faulty host（显式或随机），让 session_id 含位置信息
+    chosen_host = tot_tasks[0].faulty_devices[0]
+    session.update_session("faulty_host", chosen_host)
 
     logger.info(f"Session {session.session_id}, injected problem(s): {problem_names} under {session.scenario_name}.")
     task_description = problem.get_task_description()
@@ -61,6 +75,12 @@ if __name__ == "__main__":
         default="frr_service_down",
         help="The issue to inject, e.g. frr_service_down, bmv2_service_down, etc.",
     )
+    parser.add_argument(
+        "--faulty_host",
+        type=str,
+        default=None,
+        help="显式指定故障 host（如 pc_0_3）；不传则 NIKA random 选（老行为）。",
+    )
     args = parser.parse_args()
 
-    inject_failure(problem_names=[args.problem])
+    inject_failure(problem_names=[args.problem], faulty_host=args.faulty_host)

@@ -23,6 +23,10 @@ def start_net_env(scenario: str, topo_size: Literal["s", "m", "l"] | None = None
     session.init_session()
     session.update_session("scenario_name", scenario)
     session.update_session("scenario_topo_size", topo_size)
+    # 修 bug: 保存 scenario_params 让 step2 创建匹配的 net_env 实例
+    # 否则 step2 的 net_env 默认 topo_size="s"，task_description 总是 s 模板（误导 agent）
+    if topo_size:
+        session.update_session("scenario_params", {"topo_size": topo_size})
     system_logger.info(f"Started network environment: {scenario} with size {topo_size} in session {session.session_id}")
     return net_env
 
